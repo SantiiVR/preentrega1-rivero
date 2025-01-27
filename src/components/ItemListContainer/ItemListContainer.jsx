@@ -1,27 +1,35 @@
 import React, { useEffect, useState } from 'react';
+import { getProducts, getProductsByCategory } from '../../asyncMock';
+import { useParams } from 'react-router-dom';
+import ItemList from '../itemList/ItemList';
+
+
 
 const ItemListContainer = ({ greeting }) => {
-  const [showGreeting, setShowGreeting] = useState(true);
+  const [products, setProducts] = useState([]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowGreeting(false);
-    }, 3000);
+  const {categoryId }= useParams()
 
-    // Limpiar el timeout en caso de que el componente se desmonte
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect( () => {
+
+    const asyncFunc = categoryId ? getProductsByCategory : getProducts
+
+    asyncFunc (categoryId)
+    .then(response => {
+      setProducts (response)
+    })
+    .catch (error => {
+      console.error(error)
+    }) 
+      },[categoryId])
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      {showGreeting && (
-        <div className="bg-slate-500 py-20 rounded-md shadow-xl w-3/4">
-          <h1 className="text-center text-5xl text-white">{greeting}</h1>
-        </div>
-      ) 
-      }
+    <div>
+      <h1>{greeting}</h1>
+      <ItemList products={products}/>
     </div>
-  );
-};
+      ) 
+}
 
-export default ItemListContainer;
+
+export default ItemListContainer
